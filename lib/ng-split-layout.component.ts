@@ -14,11 +14,8 @@ import {
 import { Observable, Subscription } from 'rxjs'
 import { DOCUMENT } from '@angular/platform-browser'
 
-@Directive({
-  selector: '[primary]'
-})
-export class PrimaryContainerDirective {
-  constructor(private elementRef: ElementRef) {
+class ContainerDirective {
+  constructor(protected elementRef: ElementRef) {
   }
 
   getElementDimensions() {
@@ -31,18 +28,20 @@ export class PrimaryContainerDirective {
 }
 
 @Directive({
+  selector: '[primary]'
+})
+export class PrimaryContainerDirective extends ContainerDirective {
+  constructor(protected elementRef: ElementRef) {
+    super(elementRef)
+  }
+}
+
+@Directive({
   selector: '[secondary]'
 })
-export class SecondaryContainerDirective {
-  constructor(private elementRef: ElementRef) {
-  }
-
-  getElementDimensions() {
-    return this.elementRef.nativeElement.getBoundingClientRect();
-  }
-
-  get style() {
-    return this.elementRef.nativeElement.style;
+export class SecondaryContainerDirective extends ContainerDirective {
+  constructor(protected elementRef: ElementRef) {
+    super(elementRef)
   }
 }
 
