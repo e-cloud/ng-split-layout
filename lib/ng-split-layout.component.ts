@@ -13,6 +13,7 @@ import {
 } from '@angular/core'
 import { Observable, Subscription } from 'rxjs'
 import { DOCUMENT } from '@angular/platform-browser'
+import { AnimationFrame } from 'rxjs/util/AnimationFrame'
 
 class ContainerDirective {
   constructor(protected elementRef: ElementRef) {
@@ -124,15 +125,29 @@ export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
       this.elementRef.nativeElement.setAttribute('vertical', '')
     }
 
+    let needRAF = true
     this.mouseDragSubscription = this.mouseDrag$.subscribe(event => {
-      this.handleDragMove(event)
-      const eventInstance = new Event('layoutresize', {
-        bubbles: true,
-        cancelable: true
-      })
+      if (needRAF) {
+        needRAF = false
+        AnimationFrame.requestAnimationFrame(() => {
+          if (!this.startSize) {
+            needRAF = true
+            return
+          }
 
-      this.primaryChild.dispatchEvent(eventInstance)
-      this.secondaryChild.dispatchEvent(eventInstance)
+          this.handleDragMove(event)
+
+          const eventInstance = new Event('layoutresize', {
+            bubbles: true,
+            cancelable: true
+          })
+
+          this.primaryChild.dispatchEvent(eventInstance)
+          this.secondaryChild.dispatchEvent(eventInstance)
+
+          needRAF = true
+        })
+      }
     }, err => {
       throw err
     })
