@@ -1,3 +1,14 @@
 <h1>
   {{title}}
 </h1>
+<div class="split-view-container">
+  <ng-split-layout>
+    <ng-split-layout primary [vertical]="true">
+      <div primary>primary</div>
+      <div secondary>secondary</div>
+    </ng-split-layout>
+    <div secondary>
+      <demo-map></demo-map>
+    </div>
+  </ng-split-layout>
+</div>
