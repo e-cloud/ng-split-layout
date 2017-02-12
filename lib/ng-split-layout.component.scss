@@ -1,0 +1,47 @@
+:host {
+  display: flex;
+  overflow: hidden !important;
+  transform: translateZ(0);
+}
+
+:host([vertical]) {
+  flex-direction: column;
+}
+
+:host /deep/ {
+  [handle], [primary], [secondary] {
+    flex: 1 1 auto;
+    overflow: auto;
+  }
+}
+
+:host > #splitter {
+  flex: none;
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+  min-width: 8px;
+  min-height: 8px;
+  background: #ccc;
+  fill: #fff;
+}
+
+:host(:not([vertical])) > #splitter {
+  cursor: ew-resize;
+}
+
+:host([vertical]) > #splitter {
+  cursor: ns-resize;
+}
+
+#handle,
+#splitter > [handle] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+:host([vertical]) > #splitter #handle {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
