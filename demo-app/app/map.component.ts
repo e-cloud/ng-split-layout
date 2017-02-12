@@ -2,10 +2,15 @@ import { Component, HostListener } from '@angular/core';
 
 @Component({
   selector: 'demo-map',
-  template: 'Map'
+  template: 'Map',
+  styles: [`
+    demo-map {
+      display: block;
+    }
+  `]
 })
 export class MapComponent {
-  /*@HostListener('layout-resize') onResize() {
+  @HostListener('layoutresize') onlayoutresize() {
     console.log('bubbled')
-  }*/
+  }
 }
