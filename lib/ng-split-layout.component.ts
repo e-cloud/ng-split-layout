@@ -18,6 +18,10 @@ class ContainerDirective {
   constructor(protected elementRef: ElementRef) {
   }
 
+  dispatchEvent(event) {
+    this.elementRef.nativeElement.dispatchEvent(event)
+  }
+
   getElementDimensions() {
     return this.elementRef.nativeElement.getBoundingClientRect();
   }
@@ -122,11 +126,13 @@ export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.mouseDragSubscription = this.mouseDrag$.subscribe(event => {
       this.handleDragMove(event)
+      const eventInstance = new Event('layoutresize', {
+        bubbles: true,
+        cancelable: true
+      })
 
-      /*this.elementRef.nativeElement.dispatchEvent(new Event('layout-resize', {
-       bubbles: true,
-       cancelable: true
-       }))*/
+      this.primaryChild.dispatchEvent(eventInstance)
+      this.secondaryChild.dispatchEvent(eventInstance)
     }, err => {
       throw err
     })
