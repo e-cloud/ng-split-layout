@@ -56,8 +56,11 @@ export class SecondaryContainerDirective extends ContainerDirective {
   styleUrls: ['ng-split-layout.component.scss']
 })
 export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ContentChildren(PrimaryContainerDirective) private primaryChildren: QueryList<PrimaryContainerDirective>;
-  @ContentChildren(SecondaryContainerDirective) private secondaryChildren: QueryList<SecondaryContainerDirective>;
+  @ContentChildren(PrimaryContainerDirective)
+  private primaryChildren: QueryList<PrimaryContainerDirective>;
+
+  @ContentChildren(SecondaryContainerDirective)
+  private secondaryChildren: QueryList<SecondaryContainerDirective>;
 
   private get primaryChild() {
     return this.primaryChildren.last
@@ -67,15 +70,19 @@ export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.secondaryChildren.last
   }
 
-  @ViewChild('splitter') splitter: ElementRef;
+  @ViewChild('splitter')
+  splitter: ElementRef;
 
-  @Input() vertical: boolean;
+  @Input()
+  vertical: boolean;
 
   mouseUp$: Observable<MouseEvent>;
   mouseMoves$: Observable<MouseEvent>;
   mouseDown$: Observable<MouseEvent>;
   mouseDrag$: Observable<any>;
   mouseDragSubscription: Subscription;
+
+  subscriptions: Subscription[] = [];
 
   startSize: {
     container: number;
@@ -126,7 +133,7 @@ export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
     }
 
     let needRAF = true
-    this.mouseDragSubscription = this.mouseDrag$.subscribe(event => {
+    this.subscriptions.push(this.mouseDrag$.subscribe(event => {
       if (needRAF) {
         needRAF = false
         AnimationFrame.requestAnimationFrame(() => {
@@ -137,24 +144,18 @@ export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
 
           this.handleDragMove(event)
 
-          const eventInstance = new Event('layoutresize', {
-            bubbles: true,
-            cancelable: true
-          })
-
-          this.primaryChild.dispatchEvent(eventInstance)
-          this.secondaryChild.dispatchEvent(eventInstance)
+          this.notifyResize()
 
           needRAF = true
         })
       }
     }, err => {
       throw err
-    })
+    }))
   }
 
   ngOnDestroy() {
-    this.mouseDragSubscription.unsubscribe()
+    this.subscriptions.forEach(sub => sub.unsubscribe())
   }
 
   setFlexBasis(element, flexBasis, containerSize) {
@@ -202,5 +203,15 @@ export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
     // restore cache
     this.primaryChild.style.pointerEvents = this._previousPrimaryPointerEvents;
     this.secondaryChild.style.pointerEvents = this._previousSecondaryPointerEvents;
+  }
+
+  notifyResize() {
+    const eventInstance = new Event('layoutresize', {
+      bubbles: true,
+      cancelable: true
+    })
+
+    this.primaryChild.dispatchEvent(eventInstance)
+    this.secondaryChild.dispatchEvent(eventInstance)
   }
 }
