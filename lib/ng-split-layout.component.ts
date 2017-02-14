@@ -80,7 +80,7 @@ export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
   mouseMoves$: Observable<MouseEvent>;
   mouseDown$: Observable<MouseEvent>;
   mouseDrag$: Observable<any>;
-  mouseDragSubscription: Subscription;
+  windowResize$: Observable<Event>;
 
   subscriptions: Subscription[] = [];
 
@@ -125,6 +125,8 @@ export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
           this.handleDragEnd()
         }));
     })
+
+    this.windowResize$ = Observable.fromEvent(window, 'resize')
   }
 
   ngAfterViewInit() {
@@ -149,6 +151,12 @@ export class NgSplitLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
           needRAF = true
         })
       }
+    }, err => {
+      throw err
+    }))
+
+    this.subscriptions.push(this.windowResize$.subscribe(() => {
+      this.notifyResize()
     }, err => {
       throw err
     }))
